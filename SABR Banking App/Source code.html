@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SABR Banking App</title>
+<style>
+  /* Import Inter font from Google Fonts */
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+
+  :root {
+    --primary-color: #111314;
+    --primary-color-dark: #1565c0;
+    --background-light: #f5f7fa;
+    --background-dark: #efeff1;
+    --text-primary: #121314;
+    --text-secondary: #121315;
+    --border-radius: 12px;
+    --gap: 24px;
+    --shadow-light: rgba(0,0,0,0.05);
+  }
+
+  /* Reset and base */
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background: var(--background-light);
+    color: var(--text-primary);
+    line-height: 1.5;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  a {
+    color: var(--primary-color);
+    text-decoration: none;
+  }
+  a:hover, a:focus {
+    text-decoration: underline;
+  }
+
+  /* --- Header --- */
+  header {
+    background: var(--background-dark);
+    box-shadow: 0 2px 8px var(--shadow-light);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    
+  }
+  .logo {
+    font-weight: 700;
+    font-size: 1.4rem;
+    color: var(--primary-color);
+    user-select: none;
+  }
+  .image {
+    width: 100%;
+    height: auto;
+  }
+  #img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 600px;
+  }
+  /* Breadcrumb */
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+  }
+  .breadcrumb span {
+    user-select: none;
+  }
+  .breadcrumb svg {
+    width: 16px;
+    height: 16px;
+    fill: var(--text-secondary);
+  }
+
+  /* Hamburger menu button */
+  .hamburger-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-color-dark);
+  }
+  .hamburger-btn svg {
+    width: 28px;
+    height: 28px;
+    fill: currentColor;
+  }
+  .hamburger-btn:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+  }
+
+  /* Mobile nav overlay */
+  nav.mobile-nav {
+    position: fixed;
+    top: 0; left: 0; bottom: 0; right: 0;
+    background: linear-gradient(to bottom right, #1e88e5, #1565c0);
+    color: white;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    padding-top: 64px;
+    z-index: 1100;
+  }
+  nav.mobile-nav.open {
+    transform: translateX(0);
+  }
+  nav.mobile-nav a {
+    padding: 18px 30px;
+    font-size: 1.2rem;
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  nav.mobile-nav a svg {
+    width: 24px;
+    height: 24px;
+    fill: white;
+  }
+  nav.mobile-nav a:focus-visible {
+    background: rgba(255 255 255 / 0.2);
+    outline: none;
+  }
+  nav.mobile-nav .close-btn {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    color: white;
+  }
+  nav.mobile-nav .close-btn svg {
+    width: 28px;
+    height: 28px;
+    fill: currentColor;
+  }
+  nav.mobile-nav .close-btn:focus-visible {
+    outline: 2px solid white;
+    outline-offset: 2px;
+  }
+
+
+  /* --- Main layout --- */
+
+  main {
+    flex-grow: 1;
+    padding: var(--gap);
+    max-width: 1440px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  /* Grid container for desktop */
+  .app-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--gap);
+  }
+
+  /* Dashboard card styles */
+  .card {
+    background: var(--background-dark);
+    padding: 24px;
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 12px var(--shadow-light);
+  }
+
+  .balance {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .balance-subtitle {
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+  }
+
+  .quick-actions {
+    display: flex;
+    gap: 16px;
+  }
+  .quick-action-btn {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 14px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: background-color 0.3s ease;
+  }
+  .quick-action-btn svg {
+    width: 20px;
+    height: 20px;
+    fill: white;
+  }
+  .quick-action-btn:focus-visible {
+    outline: 2px solid var(--primary-color-dark);
+    outline-offset: 2px;
+  }
+  .quick-action-btn:hover {
+    background: var(--primary-color-dark);
+  }
+
+  /* Transfer money form */
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  label {
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  input, select {
+    padding: 12px 14px;
+    font-size: 1rem;
+    border: 1.5px solid #ccc;
+    border-radius: 8px;
+    transition: border-color 0.3s ease;
+  }
+  input:focus, select:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    box-shadow: 0 0 6px var(--primary-color);
+  }
+  button.submit-btn {
+    background: var(--primary-color);
+    border: none;
+    color: white;
+    font-weight: 700;
+    padding: 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 8px;
+  }
+  button.submit-btn:hover, button.submit-btn:focus-visible {
+    background: var(--primary-color-dark);
+    outline: none;
+  }
+
+  /* Transaction history table */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  thead {
+    background: var(--primary-color);
+    color: white;
+  }
+  thead th {
+    padding: 12px;
+    text-align: left;
+    font-weight: 600;
+  }
+  tbody tr:nth-child(even) {
+    background: var(--background-light);
+  }
+  tbody tr:hover {
+    background: var(--primary-color-light, #d0e7ff);
+  }
+  tbody td {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+    font-size: 0.95rem;
+  }
+  .no-transactions {
+    font-style: italic;
+    color: var(--text-secondary);
+    text-align: center;
+    margin-top: 12px;
+  }
+
+  /* QR and bill payment card */
+  .optional-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+  .optional-actions button {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 16px 20px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    justify-content: center;
+    transition: background-color 0.3s;
+  }
+  .optional-actions button svg {
+    width: 24px;
+    height: 24px;
+    fill: white;
+  }
+  .optional-actions button:hover {
+    background: var(--primary-color-dark);
+  }
+  .optional-actions button:focus-visible {
+    outline: 2px solid var(--primary-color-dark);
+    outline-offset: 2px;
+  }
+
+
+  /* --- Responsive Layout --- */
+
+  /* Mobile: Single column with hamburger & breadcrumb */
+  @media (max-width: 767px) {
+    .app-grid {
+      grid-template-columns: 1fr;
+    }
+    .breadcrumb {
+      display: flex;
+    }
+    nav.desktop-nav {
+      display: none;
+    }
+    .hamburger-btn {
+      display: block;
+    }
+  }
+
+  /* Desktop and large desktop: Three-column grid */
+  @media (min-width: 768px) {
+    .app-grid {
+      grid-template-columns: 1fr 2.5fr 1.2fr;
+      gap: 32px;
+    }
+
+    nav.mobile-nav {
+      display: none !important;
+    }
+    .breadcrumb {
+      display: none;
+    }
+    .hamburger-btn {
+      display: none;
+    }
+
+    nav.desktop-nav {
+      display: flex;
+      flex-direction: column;
+      background: var(--background-dark);
+      border-radius: var(--border-radius);
+      padding: 24px;
+      max-width: 320px;
+      box-shadow: 0 2px 12px var(--shadow-light);
+      gap: 32px;
+      height: fit-content;
+      position: sticky;
+      top: 80px;
+    }
+    nav.desktop-nav a {
+      font-weight: 600;
+      font-size: 1rem;
+      color: var(--primary-color);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 12px 20px;
+      border-radius: 10px;
+      transition: background-color 0.3s ease;
+    }
+    nav.desktop-nav a:hover, nav.desktop-nav a:focus-visible {
+      background: var(--primary-color);
+      color: white;
+      outline: none;
+      text-decoration: none;
+    }
+    nav.desktop-nav a svg {
+      width: 24px;
+      height: 24px;
+      fill: var(--primary-color);
+      transition: fill 0.3s ease;
+    }
+    nav.desktop-nav a:hover svg, nav.desktop-nav a:focus-visible svg {
+      fill: white;
+    }
+
+    footer {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 32px 24px;
+      display: flex;
+      justify-content: space-between;
+      background: var(--background-dark);
+      box-shadow: 0 -2px 8px var(--shadow-light);
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      border-radius: 12px 12px 0 0;
+      user-select: none;
+    }
+  }
+
+  /* Large desktop max width constraint */
+  @media (min-width: 1440px) {
+    main {
+      max-width: 1280px;
+    }
+  }
+
+  /* Accessibility */
+  button, a {
+    -webkit-tap-highlight-color: transparent;
+  }
+</style>
+
+<!-- Google Material Icons CDN -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Icons" rel="stylesheet" />
+</head>
+<body>
+<header>
+  <div class="logo">SABR Bank</div>
+  <div class="image"><img id = "img" src="sabr.jpg"></img></div>
+  <nav class="desktop-nav" aria-label="Primary navigation">
+    <a href="#" data-section="dashboard" class="nav-link active" aria-current="page">
+      <span class="material-icons" aria-hidden="true">dashboard</span> Dashboard
+    </a>
+    <a href="#" data-section="transfer" class="nav-link">
+      <span class="material-icons" aria-hidden="true">send</span> Transfer Money
+    </a>
+    <a href="#" data-section="history" class="nav-link">
+      <span class="material-icons" aria-hidden="true">history</span> Transaction History
+    </a>
+    <a href="#" data-section="billpay" class="nav-link">
+      <span class="material-icons" aria-hidden="true">receipt_long</span> Bill Payment
+    </a>
+    <a href="#" data-section="qrscanner" class="nav-link">
+      <span class="material-icons" aria-hidden="true">qr_code_scanner</span> QR Scanner
+    </a>
+  </nav>
+
+  <button class="hamburger-btn" aria-label="Open navigation menu" aria-expanded="false" aria-controls="mobile-nav">
+    <span class="material-icons" aria-hidden="true">menu</span>
+  </button>
+  <nav class="mobile-nav" id="mobile-nav" aria-label="Mobile navigation" aria-hidden="true">
+    <button class="close-btn" aria-label="Close navigation menu">
+      <span class="material-icons" aria-hidden="true">close</span>
+    </button>
+    <a href="#" data-section="dashboard" class="nav-link active" aria-current="page">
+      <span class="material-icons" aria-hidden="true">dashboard</span> Dashboard
+    </a>
+    <a href="#" data-section="transfer" class="nav-link">
+      <span class="material-icons" aria-hidden="true">send</span> Transfer Money
+    </a>
+    <a href="#" data-section="history" class="nav-link">
+      <span class="material-icons" aria-hidden="true">history</span> Transaction History
+    </a>
+    <a href="#" data-section="billpay" class="nav-link">
+      <span class="material-icons" aria-hidden="true">receipt_long</span> Bill Payment
+    </a>
+    <a href="#" data-section="qrscanner" class="nav-link">
+      <span class="material-icons" aria-hidden="true">qr_code_scanner</span> QR Scanner
+    </a>
+  </nav>
+
+  <nav class="breadcrumb" aria-label="Breadcrumb navigation">
+    <span>Home</span>
+    <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M9.29 6.71a1 1 0 011.42 0L15 11l-4.29 4.29a1 1 0 11-1.42-1.42L12.17 11 9.29 8.12a1 1 0 010-1.41z"/></svg>
+  </nav>
+</header>
+
+<main>
+  <div class="app-grid" role="main">
+
+    <!-- Sidebar desktop nav placeholder for spacing on desktop -->
+    <aside aria-label="Sidebar Navigation" class="sidebar" hidden></aside>
+
+    <!-- Dashboard Section -->
+    <section tabindex="-1" id="dashboard-section" aria-live="polite" aria-label="Account dashboard" class="card">
+      <h2>Account Balance</h2>
+      <div class="balance" aria-label="Current account balance">₹12,350.75</div>
+      <div class="balance-subtitle">Available balance</div>
+
+      <div class="quick-actions" role="group" aria-label="Quick actions">
+        <button class="quick-action-btn" aria-label="Transfer Money" id="quick-transfer-btn" type="button">
+          <span class="material-icons" aria-hidden="true">send</span> Transfer
+        </button>
+        <button class="quick-action-btn" aria-label="Pay Bills" id="quick-billpay-btn" type="button">
+          <span class="material-icons" aria-hidden="true">receipt_long</span> Pay Bills
+        </button>
+        <button class="quick-action-btn" aria-label="Open QR Scanner" id="quick-qr-btn" type="button">
+          <span class="material-icons" aria-hidden="true">qr_code_scanner</span> QR Scan
+        </button>
+      </div>
+    </section>
+
+    <!-- Transfer Money Section -->
+    <section tabindex="-1" id="transfer-section" aria-live="polite" aria-label="Transfer money form" class="card" hidden>
+      <h2>Transfer Money</h2>
+      <form id="transfer-form" aria-describedby="transfer-desc" novalidate>
+        <div id="transfer-desc" class="sr-only">Fill the form to transfer money securely</div>
+
+        <label for="recipient">Recipient Name</label>
+        <input type="text" id="recipient" name="recipient" autocomplete="name" required aria-required="true" />
+
+        <label for="account-number">Account Number</label>
+        <input type="text" id="account-number" name="accountNumber" inputmode="numeric" pattern="\d{10,}" maxlength="20"
+          required aria-required="true" aria-describedby="account-number-desc" />
+        <div id="account-number-desc" class="sr-only">Enter at least 10 digits account number</div>
+
+        <label for="amount">Amount (₹)</label>
+        <input type="number" id="amount" name="amount" min="1" step="0.01" required aria-required="true" />
+
+        <label for="transfer-method">Transfer Method</label>
+        <select id="transfer-method" name="transferMethod" required aria-required="true" >
+          <option value="" disabled selected>Select method</option>
+          <option value="instant">Instant Transfer</option>
+          <option value="standard">Standard Transfer</option>
+        </select>
+
+        <button type="submit" class="submit-btn" aria-label="Submit transfer form">Send Money</button>
+      </form>
+    </section>
+
+    <!-- Transaction History Section -->
+    <section tabindex="-1" id="history-section" aria-live="polite" aria-label="Transaction history" class="card" hidden>
+      <h2>Transaction History</h2>
+      <table aria-describedby="trans-desc">
+        <caption id="trans-desc" class="sr-only">List of recent transactions</caption>
+        <thead>
+          <tr>
+            <th scope="col">Date</th>
+            <th scope="col">Description</th>
+            <th scope="col">Amount (₹)</th>
+            <th scope="col">Status</th>
+          </tr>
+        </thead>
+        <tbody id="transaction-tbody">
+          <!-- Transactions dynamically inserted here -->
+        </tbody>
+      </table>
+      <p class="no-transactions" id="no-transactions-msg" hidden>No transactions found.</p>
+    </section>
+
+    <!-- Optional Bill Payment Section -->
+    <section tabindex="-1" id="billpay-section" aria-live="polite" aria-label="Pay bills" class="card" hidden>
+      <h2>Bill Payment</h2>
+      <div class="optional-actions">
+        <button type="button" aria-label="Pay electricity bill" id="pay-electricity">
+          <span class="material-icons" aria-hidden="true">flash_on</span> Pay Electricity Bill
+        </button>
+        <button type="button" aria-label="Pay water bill" id="pay-water">
+          <span class="material-icons" aria-hidden="true">water</span> Pay Water Bill
+        </button>
+        <button type="button" aria-label="Pay internet bill" id="pay-internet">
+          <span class="material-icons" aria-hidden="true">wifi</span> Pay Internet Bill
+        </button>
+      </div>
+    </section>
+
+    <!-- Optional QR Scanner Section -->
+    <section tabindex="-1" id="qrscanner-section" aria-live="polite" aria-label="QR code scanner" class="card" hidden>
+      <h2>QR Code Scanner</h2>
+      <img src="Qr code.jpg" 
+          alt="Placeholder image showing QR code scanner interface" 
+          width="320" height="240" style="max-width: 100%; border-radius: 12px;"/>
+      <p style="margin-top: 12px; color: var(--text-secondary); font-size: 0.95rem;">
+        (QR scanner would open device camera to scan QR codes for payments or transfers.)
+      </p>
+    </section>
+
+  </div>
+</main>
+
+<footer aria-label="Application footer">
+  <div style="max-width:1440px; margin: 0 auto; padding: 16px 24px; font-size:0.9rem; color: var(--text-secondary); text-align:center;">
+    &copy; 2025 SABR Bank. All rights reserved.
+  </div>
+</footer>
+
+<script>
+  // Basic nave menu toggle for mobile nav
+  const hamburgerBtn = document.querySelector('.hamburger-btn');
+  const mobileNav = document.querySelector('nav.mobile-nav');
+  const closeBtn = mobileNav.querySelector('.close-btn');
+  const navLinksDesktop = document.querySelectorAll('nav.desktop-nav a.nav-link');
+  const navLinksMobile = mobileNav.querySelectorAll('a.nav-link');
+
+  // Sections references
+  const sections = {
+    dashboard: document.getElementById('dashboard-section'),
+    transfer: document.getElementById('transfer-section'),
+    history: document.getElementById('history-section'),
+    billpay: document.getElementById('billpay-section'),
+    qrscanner: document.getElementById('qrscanner-section'),
+  };
+
+  // Show only the selected section, hide others
+  function showSection(key) {
+    Object.entries(sections).forEach(([name, section]) => {
+      if(name === key) {
+        section.hidden = false;
+        section.focus();
+      } else {
+        section.hidden = true;
+      }
+    });
+    // Update nav active states desktop
+    navLinksDesktop.forEach(link => {
+      if(link.dataset.section === key) link.classList.add('active');
+      else link.classList.remove('active');
+    });
+    // Update nav active states mobile
+    navLinksMobile.forEach(link => {
+      if(link.dataset.section === key) link.classList.add('active');
+      else link.classList.remove('active');
+    });
+  }
+
+  // Hamburger open/close mobile menu handlers
+  hamburgerBtn.addEventListener('click', () => {
+    mobileNav.classList.add('open');
+    mobileNav.setAttribute('aria-hidden', 'false');
+    hamburgerBtn.setAttribute('aria-expanded', 'true');
+    mobileNav.querySelector('.close-btn').focus();
+  });
+  closeBtn.addEventListener('click', () => {
+    mobileNav.classList.remove('open');
+    mobileNav.setAttribute('aria-hidden', 'true');
+    hamburgerBtn.setAttribute('aria-expanded', 'false');
+    hamburgerBtn.focus();
+  });
+
+  // Mobile navigation link clicks close the menu and show section
+  navLinksMobile.forEach(link => {
+    link.addEventListener('click', e => {
+      e.preventDefault();
+      const sec = link.dataset.section;
+      showSection(sec);
+      // Close menu after selection
+      mobileNav.classList.remove('open');
+      mobileNav.setAttribute('aria-hidden', 'true');
+      hamburgerBtn.setAttribute('aria-expanded', 'false');
+      hamburgerBtn.focus();
+    });
+  });
+
+  // Desktop navigation link clicks only show section
+  navLinksDesktop.forEach(link => {
+    link.addEventListener('click', e => {
+      e.preventDefault();
+      const sec = link.dataset.section;
+      showSection(sec);
+    });
+  });
+
+  // Quick action buttons in dashboard
+  document.getElementById('quick-transfer-btn').addEventListener('click', () => showSection('transfer'));
+  document.getElementById('quick-billpay-btn').addEventListener('click', () => showSection('billpay'));
+  document.getElementById('quick-qr-btn').addEventListener('click', () => showSection('qrscanner'));
+
+  // Simple transaction history data
+  const transactions = [
+    { date: '2024-06-12', description: 'Starbucks Coffee', amount: -545, status: 'Completed' },
+    { date: '2024-06-10', description: 'Salary Deposit', amount: 25000, status: 'Completed' },
+    { date: '2024-06-09', description: 'Electricity Bill', amount: -1275, status: 'Pending' },
+  ];
+
+  const tbody = document.getElementById('transaction-tbody');
+  const noTxMsg = document.getElementById('no-transactions-msg');
+
+  // Populate transaction history table
+  function populateTransactions() {
+    tbody.innerHTML = '';
+    if(transactions.length === 0){
+      noTxMsg.hidden = false;
+      return;
+    }
+    noTxMsg.hidden = true;
+    transactions.forEach(tx => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td> ${tx.date}</td>
+        <td> ${tx.description}</td>
+        <td style="color:${tx.amount < 0 ? '#e53935' : '#43a047'};"> ${tx.amount < 0 ? '-' : '+' }₹${Math.abs(tx.amount).toFixed(2)}</td>
+        <td>${tx.status}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+  populateTransactions();
+
+  // Transfer form submit handler
+  const transferForm = document.getElementById('transfer-form');
+  transferForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    if(!transferForm.checkValidity()){
+      transferForm.reportValidity();
+      return;
+    }
+
+    // Simulate successful transfer
+    alert('Transfer submitted successfully.');
+    transferForm.reset();
+    showSection('dashboard');
+
+    // Optionally, add transaction to history (not implemented here)
+  });
+
+  // Bill payment buttons alerts
+  document.getElementById('pay-electricity').addEventListener('click', () => alert('Electricity bill payment flow initiated.'));
+  document.getElementById('pay-water').addEventListener('click', () => alert('Water bill payment flow initiated.'));
+  document.getElementById('pay-internet').addEventListener('click', () => alert('Internet bill payment flow initiated.'));
+
+  // On page load show dashboard by default
+  showSection('dashboard');
+</script>
+
+</body>
+</html>
